@@ -1,0 +1,101 @@
+import tkinter as tk
+from tkinter import ttk
+import time
+from datetime import datetime
+
+#window
+window= tk.Tk()
+window.title("Computertime")
+window.geometry("600x250")
+
+#functions
+total_lahja=0
+total_stefan=0
+
+def button_func():
+    global start, name, total_lahja, total_stefan, unit
+    starttime= datetime.now()
+    stringtime= starttime.strftime("%H:%M")
+    label2.config(text=f"Starttime = {stringtime}")
+    label2.pack()
+    stop_button.pack()
+    start = time.time()
+    name = auswahl.get()
+    start_button.pack_forget()
+    label1.pack_forget()
+    name1.pack_forget()
+    name2.pack_forget()
+
+    with open("zeiten.txt", "r") as file:
+        line = file.read()
+        total_lahja, total_stefan = line.split(",")
+        total_lahja = float(total_lahja)
+        total_stefan = float(total_stefan)
+
+def stop_func():
+    global start, name, total_lahja, total_stefan, unit
+    stoptime= datetime.now()
+    stringtime_stop= stoptime.strftime("%H:%M")
+    label3.config(text=f"Stoptime = {stringtime_stop}")
+    label3.pack()
+    end = time.time()
+    elapsed = end - start
+    elapsed = round(elapsed, 0)
+    hours = elapsed // 3600
+    minutes = (elapsed % 3600) // 60
+    seconds = elapsed % 60
+    label_elapsed.config(text=f"Session Time {name} = {hours}h {minutes}m {seconds}s")
+    label_elapsed.pack()
+    stop_button.pack_forget()
+    start_button.pack()
+    label1.pack()
+    if name == "Lahja":
+        total_lahja += elapsed
+        total_lahja= int(total_lahja)
+        hours_l = total_lahja // 3600
+        minutes_l = (total_lahja % 3600) // 60
+        seconds_l =  total_lahja % 60
+        total_time_lahja.config(text=f"Total Time Lahja= {hours_l}h {minutes_l}m {seconds_l}s")
+    elif name =="Stefan":
+        total_stefan += elapsed
+        total_stefan= int(total_stefan)
+        hours_s = total_stefan // 3600
+        minutes_s = (total_stefan % 3600) // 60
+        seconds_s =  total_stefan % 60
+        total_time_stefan.config(text=f"Total Time Stefan= {hours_s}h {minutes_s}m {seconds_s}s")
+    total_time_lahja.pack()
+    total_time_stefan.pack()
+    name1.pack()
+    name2.pack()
+    #save
+    with open("zeiten.txt", "w") as file:
+        file.write(f"{total_lahja}, {total_stefan}")
+    
+    
+#widgets
+label1= ttk.Label(master=window, text="Click if you want to start computertime. And choose your name.")
+label1.pack()
+
+start_button=ttk.Button(master=window, text="START", padding=10, command= button_func)
+start_button.pack()
+
+label2= ttk.Label(master=window, text="xxx")
+
+stop_button=ttk.Button(master=window, text="STOP", padding=10, command= stop_func)
+
+label3= ttk.Label(master=window, text="xxx")
+
+label_elapsed= ttk.Label(master=window, text="xxx", font=("Arial", 12))
+
+total_time_lahja= ttk.Label(master=window, text="xxx", font=("Arial", 18, "bold"))
+total_time_stefan= ttk.Label(master=window, text="xxx", font=("Arial", 18, "bold"))
+
+auswahl = tk.StringVar(value="")
+name1= ttk.Radiobutton(window, text="Lahja", variable=auswahl, value="Lahja")
+name2= ttk.Radiobutton(window, text="Stefan", variable=auswahl, value="Stefan")
+name1.pack()
+name2.pack()
+
+#run
+window.mainloop()
+
